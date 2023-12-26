@@ -1,3 +1,5 @@
+![Roto1](https://github.com/gopalchand/Rotofy/assets/45721890/2934fc37-4e18-48ef-8ca3-7c310de9a484)
+
 # Rotofy
 
 Combines all PNG or JPG  files in a particular directory into a video. The images must be of the same size.
@@ -5,6 +7,8 @@ Combines all PNG or JPG  files in a particular directory into a video. The image
 
 ## Installation
 
+Tested in Microsoft Widows 10
+exiftool (https://exiftool.org/) and ffmpeg (https://ffmpeg.org/) are required must be in the PATH environment variable
 Python 3.10.6 or higher required.
 
 ## Usage
@@ -111,6 +115,10 @@ type *jpg | ffmpeg.exe -loglevel <loglevel> -vcodec mjpeg -an -framerate <framer
 ### Tidy up
 
 The JSON files will be deleted unless the `--keepjson` flag option is used.
+
+## Next Steps
+
+Conversion into a Python Package.
 
 ## Contributing
 
