@@ -1,4 +1,4 @@
-# Movify
+# Rotofy
 
 Combines all PNG or JPG  files in a particular directory into a video. The images must be of the same size.
 **Stable Diffusion** annotation (Steps, CFG scale, Seed, Denoising strength) can be overlayed if required for Stable Diffusion generated PNG files.
@@ -9,7 +9,7 @@ Python 3.10.6 or higher required.
 
 ## Usage
 
-`usage: movify.py [-h] [--verbose] [--dir DIR] [--rename] [--skipjson] [--keepjson] [--annotate]
+`usage: rotofy.py [-h] [--verbose] [--dir DIR] [--rename] [--skipjson] [--keepjson] [--annotate]
                  [--moviefile MOVIEFILE] [--framerate FRAMERATE] [--overwritemovie] [--skipmovie]`
 
 Convert a directory of PNG files into a video by converting them into JPEG (.JPG extensioN) with annotation if required. 
@@ -17,60 +17,60 @@ For Stable Diffusion PNG files, annotation associated with image generation can 
 A directory of non Stable Diffusion JPEG files can also be converted into a video if the `--skipjson` option is used.
 
 ```
-movify
+rotofy
 ```
 will create an output.avi file containing all the PNG images concatenated in filename order.
 
 ```
-movify --directory .
+rotofy --directory .
 ```
 will create an output.avi file containing all the PNG images concatenated in filename order in the directory specified.
 
 
 ```
-movify --moviefile movie.avi --framerate 4
+rotofy --moviefile movie.avi --framerate 4
 ```
 will create a movie.avi file containing all the PNG images concatenated in filename order using a frame rate of 4 frames per second.
 
 ```
-movify --verbose
+rotofy --verbose
 ```
 will create an output.avi file containing all the PNG images in the current directory concatenated in filename order and provide debugging information.
 
 ```
-movify --rename
+rotofy --rename
 ```
 will create an output.avi file containing all the PNG images concatenated in modify date order by **renaming the PNG files** using the modify date.
 This is sometimes necessary because each file has the format <counter>-<seed>.png where <counter> is a 5 digit number that resets every day.
 
 ```
-movify --annotate
+rotofy --annotate
 ```
 will create an output.avi file containing all the PNG images concatenated in filename order with annotation.
 
 ```
-movify --keepjson
+rotofy --keepjson
 ```
 will create an output.avi file containing all the PNG images concatenated in filename order and keep the JSON files describing each image.
 This will allow the JSON generation part to be skipped.
 
 ```
-movify --skipjson
+rotofy --skipjson
 ```
 Skip the JSON file generation phase and create the movie.
 
 ```
-movify --skipmovie
+rotofy --skipmovie
 ```
 Skip the movie generation phase.
 
 ```
-movify --overwritemovie
+rotofy --overwritemovie
 ```
 will create an output.avi file containing all the PNG images concatenated in filename order and not prompt before overwriting an existing output.avi file
 
 ```
-movify --framerate 4
+rotofy --framerate 4
 ```
 will create an output.avi file containing all the PNG images concatenated in filename order using a framerate of 4 per second.
 
