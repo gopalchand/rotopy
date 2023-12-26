@@ -120,7 +120,9 @@ The JSON files will be deleted unless the `--keepjson` flag option is used.
 
 ## Next Steps
 
-Conversion into a Python Package.
+1. Fix pylint errors.
+2. Code testing.
+3. Conversion into a Python Package.
 
 ## Contributing
 
