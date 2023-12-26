@@ -1,3 +1,5 @@
+(https://www.drstemrepair.com/stable-diffusion/rotofy/roto1.png)
+
 # Rotofy
 
 Combines all PNG or JPG  files in a particular directory into a video. The images must be of the same size.
