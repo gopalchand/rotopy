@@ -116,6 +116,10 @@ type *jpg | ffmpeg.exe -loglevel <loglevel> -vcodec mjpeg -an -framerate <framer
 
 The JSON files will be deleted unless the `--keepjson` flag option is used.
 
+## Next Steps
+
+Conversion into a Python Package.
+
 ## Contributing
 
 Please use GitHub issue tracking to report bugs and request features.
