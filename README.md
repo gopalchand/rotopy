@@ -1,4 +1,4 @@
-(https://www.drstemrepair.com/stable-diffusion/rotofy/roto1.png)
+![Roto1](https://github.com/gopalchand/Rotofy/assets/45721890/2934fc37-4e18-48ef-8ca3-7c310de9a484)
 
 # Rotofy
 
