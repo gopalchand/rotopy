@@ -5,7 +5,8 @@ Combines all PNG or JPG  files in a particular directory into a video. The image
 
 ## Installation
 
-exiftool (https://exiftool.org/) and ffmpeg (https://ffmpeg.org/) must be installed
+Tested in Microsoft Widows 10
+exiftool (https://exiftool.org/) and ffmpeg (https://ffmpeg.org/) are required must be in the PATH environment variable
 Python 3.10.6 or higher required.
 
 ## Usage
