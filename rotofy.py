@@ -103,19 +103,19 @@ try:
         # Prompt the user and get input
         response = input("Warning: Using current directory for conversion and/or movie creation.\n Are you sure you want to continue [Y/n]?")
         if not response:
-            response = "Y"        
+            response = "Y"
         if response.upper() == 'Y':
-            directory_path = os.getcwd()  # Default to the current directory        
+            directory_path = os.getcwd()  # Default to the current directory
         else:
             print("Exiting program")
             sys.exit(1)  # Use a non-zero exit code to indicate an error
-    else:  
+    else:
         directory_path = conversion_dir
 
     png_present = False
     if skipjson_mode is False:
         if verbose_mode is True:
-            print("Skipping creation of JSON files")        
+            print("Skipping creation of JSON files")
         # Iterate through all files in the directory
         for filename in os.listdir(directory_path):
             if filename.endswith(".png"):
@@ -126,20 +126,20 @@ try:
                 if verbose_mode:
                     print(f"EXIF tags read from file: {png_tags}")
                 source_file = png_tags.get('SourceFile')
-                modifydate_str = png_tags.get('Datemodify')  # if the file has been modified by another application            
+                modifydate_str = png_tags.get('Datemodify')  # if the file has been modified by another application
                 modifydate = None
                 if modifydate_str is not None:
                     if verbose_mode is True:
-                        print("datemodify found - using modify date")                    
+                        print("datemodify found - using modify date")
                     modifydate = datetime.strptime(modifydate_str, "%Y-%m-%dT%H:%M:%S%z")
                 else:
                     if verbose_mode is True:
-                        print("datemodify is empty - falling back on File Modify Date")                                      
+                        print("datemodify is empty - falling back on File Modify Date")
                     modifydate_str = png_tags.get('FileModifyDate')
                     if modifydate_str is not None:
                         modifydate = datetime.strptime(modifydate_str, "%Y:%m:%d %H:%M:%S%z")
-                parameters = png_tags.get('Parameters') 
-                
+                parameters = png_tags.get('Parameters')
+
                 if verbose_mode is True:
                     print("EXIF extract")
                     print(f"SourceFile = {source_file}")
@@ -150,7 +150,7 @@ try:
                     if verbose_mode is True:
                         print(f"Missing EXIF tag SourceFile using filename {filename}")
                         source_file = filename
-                
+
                 # Extract the file extension from source_file
                 source_file_name, source_file_extension = os.path.splitext(source_file)
 
@@ -159,35 +159,35 @@ try:
                     # Rename the file using the formatted timestamp if datemodify exists
                     if modifydate is not None:
                         new_file_name = modifydate.strftime("%y%m%d%H%M%S") + source_file_extension
-                                            
+
                         if os.path.isfile(new_file_name) is True:
                             print(f"Two files have the same modify dates:{modifydate} - do not use rename - exiting")
-                            sys.exit(1)  # Use a non-zero exit code to indicate an error                        
+                            sys.exit(1)  # Use a non-zero exit code to indicate an error
                         else:
                             os.rename(source_file, new_file_name)
                         print(f"file {source_file} renamed to {new_file_name}")
                     else:
                         if verbose_mode is True:
                             print(f"File {filename} does not have a date-based EXIF Tag to use - Not renaming")
-                
+
                 # Extract the parameters from the text
                 if parameters is not None:
                     extracted_parameters = extract_parameters(parameters)
                     if verbose_mode is True:
                         print("The extracted parameters are:")
                         for key, value in extracted_parameters.items():
-                            print(f"{key}: {value}")            
+                            print(f"{key}: {value}")
                 else:
                     if verbose_mode is True:
                         print(f"file {filename} does not have a Parameters EXIF Tag - Using default values")
                     extracted_parameters = 'None'
 
                 # Write Parameters to a text file with the same filename but with .txt extension
-                output_json_filename = os.path.splitext(new_file_name)[0] + ".json"        
+                output_json_filename = os.path.splitext(new_file_name)[0] + ".json"
                 with open(output_json_filename, "w") as json_file:
                     json.dump(extracted_parameters, json_file, indent=4)
-                    if verbose_mode is True:            
-                        print(f"The Parameters have been written to: {output_json_filename}")        
+                    if verbose_mode is True:
+                        print(f"The Parameters have been written to: {output_json_filename}")
                     else:
                         print("1", end='', flush=True)
             else:
@@ -200,8 +200,8 @@ try:
         print("Making movie file")
     else:
         print("\n")
-        
-    json_present = False    
+
+    json_present = False
     png_present = False
     # Iterate through the PNG files in the directory
     for png_file in sorted(os.listdir(directory_path)):
@@ -218,10 +218,10 @@ try:
                         text_to_draw = f"File: {png_filename} | Steps {json_data['Steps']} | CFG scale {json_data['CFG scale']} | Seed {json_data['Seed']} | Denoising strength {json_data['Denoising strength']} |"
                     else:
                         text_to_draw = ""
-                        
+
                 # Use OpenCV to annotate file if necessary
                 if verbose_mode is True:
-                    print(f"Reading {png_file} for annotate")            
+                    print(f"Reading {png_file} for annotate")
                 image = cv2.imread(png_file)
                 height, width, channels = image.shape
                 top_bar = 30
@@ -232,18 +232,18 @@ try:
                         print(f"annotating file with {text_to_draw}")
                     image = cv2.rectangle(image, (0,0), (width, top_bar), (0,0,0), -1)
                     image = cv2.putText(image, text_to_draw, (text_offset_x,text_offset_y), fontScale = 0.5, fontFace = cv2.FONT_HERSHEY_PLAIN, \
-                        color = (255,255,255), thickness = 1, bottomLeftOrigin=False)               
+                        color = (255,255,255), thickness = 1, bottomLeftOrigin=False)
                 jpeg_file =os.path.splitext(png_file)[0] + ".jpg"
                 cv2.imwrite(jpeg_file, image)
-                
+
                 print("2", end='', flush=True)
                 if verbose_mode is True:
                     print(f"\nJPEG file {jpeg_file} saved")
-                    
+
     if png_present is False:
         print("Error no PNG files found (conversion may be required) - exiting program")
         sys.exit(1)  # Use a non-zero exit code to indicate an error
-        
+
     if movie_file is not None:
         output_file = movie_file
     else:
@@ -263,11 +263,11 @@ try:
             if response.upper() == 'Y':
                 if verbose_mode is True:
                     print (f"deleting {output_file}")
-                os.remove(output_file)    
+                os.remove(output_file)
             else:
                 print("Exiting program")
-                sys.exit(1)  # Use a non-zero exit code to indicate an error        
-        
+                sys.exit(1)  # Use a non-zero exit code to indicate an error
+
     # Call ffmpeg to create the movie
     # Appropriate level of logging based upon verbose_mode
     # no audio stream
@@ -276,8 +276,8 @@ try:
     if verbose_mode is True:
         loglevel = 'debug'
     else:
-        loglevel = 'panic'    
-    
+        loglevel = 'panic'
+
     if framerate_val != None:
         # This suffers from https://trac.ffmpeg.org/ticket/3164 - missing first/last frame
         ffmpeg_cmd_line = f'type *jpg | {ffmpeg_cmd} -loglevel {loglevel} -framerate {framerate_val} -vcodec mjpeg -an -f image2pipe -i - -pix_fmt yuvj420p {output_file}'
@@ -285,7 +285,7 @@ try:
         ffmpeg_cmd_line = f'type *jpg | {ffmpeg_cmd} -loglevel {loglevel} -vcodec mjpeg -an -f image2pipe -i - -pix_fmt yuvj420p {output_file}'
     print(f"about to run {ffmpeg_cmd_line}")
     try:
-        completed_process = subprocess.run(ffmpeg_cmd_line, shell=True, check=True)        
+        completed_process = subprocess.run(ffmpeg_cmd_line, shell=True, check=True)
         print(f"output file {output_file} ready")
     except subprocess.CalledProcessError as e:
         print(f"ffmpeg returned a non-zero exit status: {e.returncode} - consider using --verbose")
