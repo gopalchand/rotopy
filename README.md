@@ -1,12 +1,125 @@
-Extract EXIF tag information and save it to an output file.
+# Movify
 
-PNG files in the current directory or the directory specified by --dir will be renamed based upon modify date if --rename is used.
-This is necessary if the prefix filenames over multiple dates is the same.
-JSON files will be created based upon the EXIF tag: parameter if it exists. Use --skipjson to avoid recreating these files.
-JSON files will be deleted unless --keepjson is used.
-JPEG images will be created from the PNG files using the parameter data in the respective JSON file.
-The JPEG images will be annotated with key parameters
-A movie will be created with the name output.mp4 or the movie file specified by --moviefile.
-The default frame rate can be changed by using --framerate.
---overwritemovie will overwrite any existing movie file.
---skipmovie will skip the creation of the movie. Use this to rename files and/or create JSON files only.
+Combines all PNG or JPG  files in a particular directory into a video. The images must be of the same size.
+**Stable Diffusion** annotation (Steps, CFG scale, Seed, Denoising strength) can be overlayed if required for Stable Diffusion generated PNG files.
+
+## Installation
+
+Python 3.10.6 or higher required.
+
+## Usage
+
+`usage: movify.py [-h] [--verbose] [--dir DIR] [--rename] [--skipjson] [--keepjson] [--annotate]
+                 [--moviefile MOVIEFILE] [--framerate FRAMERATE] [--overwritemovie] [--skipmovie]`
+
+Convert a directory of PNG files into a video by converting them into JPEG (.JPG extensioN) with annotation if required. 
+For Stable Diffusion PNG files, annotation associated with image generation can be saved in the JPEG file if the `--annotate` option is used.
+A directory of non Stable Diffusion JPEG files can also be converted into a video if the `--skipjson` option is used.
+
+```
+movify
+```
+will create an output.avi file containing all the PNG images concatenated in filename order.
+
+```
+movify --directory .
+```
+will create an output.avi file containing all the PNG images concatenated in filename order in the directory specified.
+
+
+```
+movify --moviefile movie.avi --framerate 4
+```
+will create a movie.avi file containing all the PNG images concatenated in filename order using a frame rate of 4 frames per second.
+
+```
+movify --verbose
+```
+will create an output.avi file containing all the PNG images in the current directory concatenated in filename order and provide debugging information.
+
+```
+movify --rename
+```
+will create an output.avi file containing all the PNG images concatenated in modify date order by **renaming the PNG files** using the modify date.
+This is sometimes necessary because each file has the format <counter>-<seed>.png where <counter> is a 5 digit number that resets every day.
+
+```
+movify --annotate
+```
+will create an output.avi file containing all the PNG images concatenated in filename order with annotation.
+
+```
+movify --keepjson
+```
+will create an output.avi file containing all the PNG images concatenated in filename order and keep the JSON files describing each image.
+This will allow the JSON generation part to be skipped.
+
+```
+movify --skipjson
+```
+Skip the JSON file generation phase and create the movie.
+
+```
+movify --skipmovie
+```
+Skip the movie generation phase.
+
+```
+movify --overwritemovie
+```
+will create an output.avi file containing all the PNG images concatenated in filename order and not prompt before overwriting an existing output.avi file
+
+```
+movify --framerate 4
+```
+will create an output.avi file containing all the PNG images concatenated in filename order using a framerate of 4 per second.
+
+## Under the Hood
+
+### JSON file creation
+
+For each PNG file in the chosen directory, key Stable Diffusion parameters in the EXIF tags are extracted and saved in a corresponding JSON file.
+e.g. for image `12345-12345.PNG`, the JSON file will be `12345-12345.JSON`.
+
+In the current version, following paramters are saved: Steps, CFG scale, Seed and Denoising strength. Here is an example of such a JSON file:
+```
+{
+    "Steps": "20",
+    "CFG scale": "7",
+    "Seed": "42",
+    "Denoising strength": "0.5"
+}
+```
+
+### JPEG file creation
+
+A JPEG file will then be generated from the PNG file and if the `--annotate` option is used then the parameter values as text at the top of the image.
+
+If the files need to be renamed because they have been generated over multiple days, the `--rename` option can be used. This will create files of the formaat `YYYYMMddHHMMSS.JPG`.
+
+### Movie file creation
+
+The JPEG files will then be concatenated in filename order using FFMPEG to create an movie file. 
+
+The `--framerate` option can be used to change the framerate. There appears to be a bug in FFMPEG that skips the first and/or last frame of the video if the framerate is manually set.
+
+In the current version, the AVI container is used. The FFMPEG command is currently (if `--framerate` is set)
+```
+type *jpg | ffmpeg.exe -loglevel <loglevel> -vcodec mjpeg -an -framerate <framerate> -f image2pipe -i - -pix_fmt yuvj420p <outputmoviefile>
+```
+
+### Tidy up
+
+The JSON files will be deleted unless the `--keepjson` flag option is used.
+
+## Contributing
+
+Please use GitHub issue tracking to report bugs and request features.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+Some code was created with the assistance of OpenAI's ChatGPT.
