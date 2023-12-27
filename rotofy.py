@@ -170,7 +170,8 @@ try:
         movie_file_name, movie_file_extension = os.path.splitext(movie_file)
         log_message(MESSAGE_DEBUG, f"Movie file extension = {movie_file_extension}")
         if movie_file_extension == "":
-            log_message(MESSAGE_ERROR, f"invalid file extension for movie file:'{movie_file_extension}' does not exist")
+            log_message(MESSAGE_ERROR, f"invalid file extension for movie file:'{movie_file_extension}' \
+does not exist")
             sys.exit(ERR_INVALID_MOVIE_EXT)  # Use a non-zero exit code to indicate an error
         else:
             if str.lower(movie_file_extension) in supported_movie_extensions:
@@ -198,7 +199,8 @@ try:
     # Path to the Pictures directory
     if conversion_dir is None:
         # Prompt the user and get input
-        response = input("Warning: No directory specified using --dir. Are you sure you want to continue with current directory [Y/n]?")
+        response = input("Warning: No directory specified using --dir. \
+Are you sure you want to continue with current directory [Y/n]?")
         agree_list = {'yes', 'y', ''}
         if response.lower() in agree_list:
             directory_path = os.getcwd()  # Default to the current directory
@@ -213,7 +215,8 @@ try:
         # Iterate through the PNG files in the directory
         PNG_FILE_COUNT = len(glob.glob1(directory_path,"*.png"))
         if PNG_FILE_COUNT == 0:
-            log_message(MESSAGE_ERROR, "Error no PNG files found (conversion may be required) -exiting program")
+            log_message(MESSAGE_ERROR, "Error no PNG files found (conversion may be required) \
+- exiting program")
             sys.exit(ERR_NO_PNG_FOR_JSON)  # Use a non-zero exit code to indicate an error
 
         log_message(MESSAGE_INFO, f"Creating JSON files from {PNG_FILE_COUNT} PNG files")
@@ -225,11 +228,15 @@ try:
         for filename in os.listdir(directory_path):
             if filename.endswith(".png"):
                 file_path = os.path.join(directory_path, filename)
-                tags = ["-SourceFile", "-Datemodify", "-FileModifyDate", "-Parameters"]  # Replace with the tags you want to extract
+
+                # tags to be extracted
+                tags = ["-SourceFile", "-Datemodify", "-FileModifyDate", "-Parameters"]
                 png_tags = get_png_exif_tags(file_path, tags)
                 log_message(MESSAGE_DEBUG, f"EXIF tags read from file: {png_tags}")
                 source_file = png_tags.get('SourceFile')
-                modifydate_str = png_tags.get('Datemodify')  # if the file has been modified by another application
+
+                # if the file has been modified by another application
+                modifydate_str = png_tags.get('Datemodify')
                 MODIFYDATE = None
                 if modifydate_str is not None:
                     log_message(MESSAGE_DEBUG, "datemodify found - using modify date")
@@ -248,7 +255,9 @@ try:
 
                 if source_file is None:
                     log_message(MESSAGE_DEBUG, f"Missing EXIF tag SourceFile using filename {filename}")
-                    source_file = filename  # TODO - testing required: this line was part of verbose output prior to change to log_message
+
+                    # TODO - testing required: this line was part of verbose output prior to change to log_message
+                    source_file = filename
 
                 log_message(MESSAGE_DEBUG, "Attempting file rename based upon modify date")
 
@@ -264,14 +273,19 @@ try:
                         new_filename = MODIFYDATE.strftime("%y%m%d%H%M%S") + file_extension
 
                         if os.path.isfile(os.path.join(directory_path, new_filename)) is True:
-                            log_message(MESSAGE_ERROR, f"Two files have the same modify dates:{MODIFYDATE} - perhaps --rename has already been used resulting in new modify dates - exiting")
+                            log_message(MESSAGE_ERROR, f"Two files have the same modify dates:{MODIFYDATE} \
+- perhaps --rename has already been used resulting in new modify dates\
+- exiting")
                             sys.exit(ERR_RENAME_DUPLICATE)  # Use a non-zero exit code to indicate an error
                         else:
-                            os.rename(os.path.join(directory_path, filename), os.path.join(directory_path, new_filename))
+                            os.rename(os.path.join(directory_path, filename), \
+os.path.join(directory_path, new_filename))
 
-                        log_message(MESSAGE_DEBUG, f"file {os.path.join(directory_path, filename)} renamed to {os.path.join(directory_path, new_filename)}")
+                        log_message(MESSAGE_DEBUG, f"file {os.path.join(directory_path, filename)} \
+renamed to {os.path.join(directory_path, new_filename)}")
                     else:
-                        log_message(MESSAGE_DEBUG, f"File {os.path.join(directory_path, new_filename)} does not have a date-based EXIF Tag to use - Not renaming")
+                        log_message(MESSAGE_DEBUG, f"File {os.path.join(directory_path, new_filename)} \
+does not have a date-based EXIF Tag to use - Not renaming")
 
                 # Extract the parameters from the text
                 if parameters is not None:
@@ -279,7 +293,8 @@ try:
                     log_message(MESSAGE_DEBUG, "The extracted parameters are:")
                     log_message(MESSAGE_DEBUG, f"{EXTRACTED_PARAMETERS}")
                 else:
-                    log_message(MESSAGE_DEBUG, f"file {filename} does not have a Parameters EXIF Tag - Using default values")
+                    log_message(MESSAGE_DEBUG, f"file {filename} does not have a Parameters EXIF Tag \
+- Using default values")
                     EXTRACTED_PARAMETERS = 'None'
 
                 # Write Parameters to a text file with the same filename but with .txt extension
@@ -287,7 +302,8 @@ try:
                 with open(os.path.join(directory_path, output_json_filename), "w", -1, 'utf-8') as json_file:
                     json.dump(EXTRACTED_PARAMETERS, json_file, indent=4)
                     if verbose_mode is True:
-                        log_message(MESSAGE_DEBUG, f"The Parameters have been written to: {os.path.join(directory_path, output_json_filename)}")
+                        log_message(MESSAGE_DEBUG, f"The Parameters have been written to: \
+{os.path.join(directory_path, output_json_filename)}")
                     else:
                         json_create_count = json_create_count + 1
                         pb_show(json_create_count,PNG_FILE_COUNT, str(json_create_count))
@@ -322,17 +338,21 @@ try:
                         TEXT_TO_DRAW =''
                         json_data = json.load(f)
                         if json_data != 'None':
-                            TEXT_TO_DRAW = f"{png_filename} | Steps {json_data['Steps']} | CFG {json_data['CFG scale']} | Seed {json_data['Seed']} | Denoise {json_data['Denoising strength']} |"
+                            TEXT_TO_DRAW = f"{png_filename} | Steps {json_data['Steps']} | \
+CFG {json_data['CFG scale']} | Seed {json_data['Seed']} | \
+Denoise {json_data['Denoising strength']} |"
                         else:
                             TEXT_TO_DRAW = ""
 
                     log_message(MESSAGE_DEBUG, f"annotating file with {TEXT_TO_DRAW}")
                     height, width, channels = image.shape
                     image = cv2.rectangle(image, (0,0), (width, TOP_BAR), (0,0,0), -1)
-                    image = cv2.putText(image, TEXT_TO_DRAW, (TEXT_OFFSET_X,TEXT_OFFSET_Y), fontScale = TEXT_FONTSCALE, fontFace = TEXT_FONTFACE, \
-                        color = (255,255,255), thickness = 1, bottomLeftOrigin=False)
+                    image = cv2.putText(image, TEXT_TO_DRAW, (TEXT_OFFSET_X,TEXT_OFFSET_Y), \
+fontScale = TEXT_FONTSCALE, fontFace = TEXT_FONTFACE, \
+color = (255,255,255), thickness = 1, bottomLeftOrigin=False)
                 else:
-                    log_message(MESSAGE_ERROR, f"Error: JSON file {json_file} not found. Perhaps --skipjson has been used without JSON file creation - exiting program")
+                    log_message(MESSAGE_ERROR, f"Error: JSON file {json_file} not found. \
+Perhaps --skipjson has been used without JSON file creation - exiting program")
                     sys.exit(ERR_NO_JSON_FOR_ANNOTATE)  # Use a non-zero exit code to indicate an error
 
             jpeg_file =os.path.splitext(png_file)[0] + ".jpg"
@@ -360,7 +380,8 @@ try:
             os.remove(os.path.join(directory_path, OUTPUT_FILE))
         else:
             # Prompt the user and get input
-            response = input(f"\nMovie file {os.path.join(directory_path, OUTPUT_FILE)} exists - use --overwritemovie to avoid in future. Delete [y/N]?")
+            response = input(f"\nMovie file {os.path.join(directory_path, OUTPUT_FILE)} exists \
+- use --overwritemovie to avoid in future. Delete [y/N]?")
             disagree_list = {'no', 'n', ''}
             if response.lower() in disagree_list:
                 log_message(MESSAGE_ERROR, "Exiting program")
@@ -385,9 +406,13 @@ try:
 
     if framerate_val is not None:
         log_message(MESSAGE_WARN, "Last frame of movie file may not be vieweable for non-default frame rates")
-        ffmpeg_cmd_line = f'type {os.path.join(directory_path, "*.jpg")} | {FFMPEG_CMD} -loglevel {LOG_LEVEL} -framerate {framerate_val}  -an -f image2pipe -i - {os.path.join(directory_path, OUTPUT_FILE)}'
+        ffmpeg_cmd_line = f'type {os.path.join(directory_path, "*.jpg")} | \
+{FFMPEG_CMD} -loglevel {LOG_LEVEL} -framerate {framerate_val}  \
+-an -f image2pipe -i - {os.path.join(directory_path, OUTPUT_FILE)}'
     else:
-        ffmpeg_cmd_line = f'type {os.path.join(directory_path, "*.jpg")} | {FFMPEG_CMD} -loglevel {LOG_LEVEL} -an -f image2pipe -i - {os.path.join(directory_path, OUTPUT_FILE)}'
+        ffmpeg_cmd_line = f'type {os.path.join(directory_path, "*.jpg")} | \
+{FFMPEG_CMD} -loglevel {LOG_LEVEL} -an -f image2pipe -i - \
+{os.path.join(directory_path, OUTPUT_FILE)}'
 
     log_message(MESSAGE_INFO, f"About to run '{ffmpeg_cmd_line}'")
     try:
@@ -395,7 +420,8 @@ try:
         completed_process = subprocess.run(ffmpeg_cmd_line, shell=True, capture_output=False, check=True)
         log_message(MESSAGE_INFO, f"Output file {OUTPUT_FILE} successfully created")
     except subprocess.CalledProcessError as e:
-        log_message(MESSAGE_WARN, f"ffmpeg returned a non-zero exit status: {e.returncode} - consider using --verbose")
+        log_message(MESSAGE_WARN, f"ffmpeg returned a non-zero exit status: {e.returncode} \
+- consider using --verbose")
 
     #tidy up
     if keepjson_mode is False:
@@ -404,6 +430,7 @@ try:
                 json_filename = os.path.splitext(json_file)[0]
                 log_message(MESSAGE_DEBUG, f"Deleting file {directory_path + json_file}")
                 os.remove(os.path.join(directory_path, json_file))
+
 except Exception as e:
     log_message(MESSAGE_ERROR, f"Unhandled exception: {traceback.format_exception(*sys.exc_info())}")
     raise
