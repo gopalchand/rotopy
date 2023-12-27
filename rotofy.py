@@ -119,7 +119,8 @@ def pb_show(pb_count, pb_total, pb_suffix):
     pb_filled_up_length = int(round(pb_bar_length * pb_count / pb_total))
     pb_percentage = round(100.0 * pb_count / pb_total, 1)
     pb_bar = '=' * pb_filled_up_length + '-' * (pb_bar_length - pb_filled_up_length)
-    sys.stdout.write('[%s] %s%s ...%s\r' %(pb_bar, pb_percentage, '%', pb_suffix))
+    #sys.stdout.write('[%s] %s%s ...%s\r' %(pb_bar, pb_percentage, '%', pb_suffix))
+    sys.stdout.write(f'[{pb_bar}] {pb_percentage}% ...{pb_suffix}\r')
     sys.stdout.flush()
 
 # Outermost try
@@ -313,7 +314,7 @@ try:
             image = cv2.imread(os.path.join(directory_path, f"{png_file}"))
 
             if annotate_mode is True:
-                log_message(MESSAGE_DEBUG, f"preparing annotation")
+                log_message(MESSAGE_DEBUG, "preparing annotation")
 
                 json_file = os.path.join(directory_path, f"{png_filename}.json")
                 if os.path.exists(json_file):
