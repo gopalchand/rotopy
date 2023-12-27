@@ -5,8 +5,9 @@ rotify: Combine PNG or JPEG files in a folder into a movie file.
 
 # # Python pre-requisites
 # python v3.10 or higher
-# pip install tqdm --user
-# pip install opencv-python --user
+# pip install progressbar
+# pip install numpy
+# pip install opencv-python
 
 # External application pre-requisites:
 # exiftool (https://exiftool.org/) and ffmpeg (https://ffmpeg.org/) must be installed
@@ -20,7 +21,6 @@ import argparse
 import traceback
 import glob
 from datetime import datetime
-import progressbar
 import cv2
 
 EXIF_TOOL_CMD = "exiftool.exe"
@@ -82,7 +82,8 @@ def get_png_exif_tags(exif_file_path, exif_tags):
     try:
         exif_data = subprocess.check_output(exiftool_cmd)
     except subprocess.CalledProcessError as exif_e:
-        log_message(f"exiftool returned a non-zero exit status: {exif_e.returncode}")
+        log_message(MESSAGE_ERROR, f"exiftool returned a non-zero exit status: {exif_e.returncode}")
+        sys.exit(exif_e.returncode)  # Use a non-zero exit code to indicate an error
 
     exif_data_json = exif_data.decode('utf-8')
     return json.loads(exif_data_json)[0]
@@ -218,7 +219,7 @@ try:
         if rename_mode is True:
             log_message(MESSAGE_INFO, "Also renaming PNG files using modified date")
 
-        JSON_CREATE_COUNT = 0
+        json_create_count = 0
         # Iterate through all files in the directory
         for filename in os.listdir(directory_path):
             if filename.endswith(".png"):
@@ -287,8 +288,8 @@ try:
                     if verbose_mode is True:
                         log_message(MESSAGE_DEBUG, f"The Parameters have been written to: {os.path.join(directory_path, output_json_filename)}")
                     else:
-                        JSON_CREATE_COUNT = JSON_CREATE_COUNT + 1
-                        pb_show(JSON_CREATE_COUNT,PNG_FILE_COUNT, str(JSON_CREATE_COUNT))
+                        json_create_count = json_create_count + 1
+                        pb_show(json_create_count,PNG_FILE_COUNT, str(json_create_count))
             else:
                 log_message(MESSAGE_DEBUG, f"Skipping non-PNG file/directory {filename}")
 
@@ -302,7 +303,7 @@ try:
     if annotate_mode is True:
         log_message(MESSAGE_INFO, "Also annotating JPEG files with data from JSON files.")
 
-    JPEG_CREATE_COUNT = 0
+    jpeg_create_count = 0
     for png_file in sorted(os.listdir(directory_path)):
         if png_file.endswith(".png"):
             png_filename = os.path.splitext(png_file)[0]
@@ -338,8 +339,8 @@ try:
             if verbose_mode is True:
                 log_message(MESSAGE_DEBUG, f"\nJPEG file {directory_path + jpeg_file} saved")
             else:
-                JPEG_CREATE_COUNT = JPEG_CREATE_COUNT + 1
-                pb_show(JPEG_CREATE_COUNT,PNG_FILE_COUNT,str(JPEG_CREATE_COUNT))
+                jpeg_create_count = jpeg_create_count + 1
+                pb_show(jpeg_create_count,PNG_FILE_COUNT,str(jpeg_create_count))
 
     log_message(MESSAGE_INFO, "\nCreating Movie file")
     if framerate_val is True:
