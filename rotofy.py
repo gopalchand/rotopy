@@ -101,7 +101,9 @@ def sd_extract_parameters(sd_parameters_text):
         "Denoising strength": "Denoising strength"
     }
     for sd_line in sd_parameters_text.split(','):
+        #pylint: disable=consider-using-dict-items
         for sd_key in sd_key_mapping:
+            #pylint: enable=consider-using-dict-items
             if sd_key in sd_line:
                 sd_value = sd_line.split(':')[1].strip()
                 sd_extracted_parameters[sd_key_mapping[sd_key]] = sd_value
@@ -223,7 +225,9 @@ Are you sure you want to continue with current directory [Y/n]?")
         if rename_mode is True:
             log_message(MESSAGE_INFO, "Also renaming PNG files using modified date")
 
+        # pylint: disable=invalid-name
         json_create_count = 0
+        # pylint: enable=invalid-name
         # Iterate through all files in the directory
         for filename in os.listdir(directory_path):
             if filename.endswith(".png"):
@@ -320,7 +324,9 @@ does not have a date-based EXIF Tag to use - Not renaming")
     if annotate_mode is True:
         log_message(MESSAGE_INFO, "Also annotating JPEG files with data from JSON files.")
 
+    # pylint: disable=invalid-name
     jpeg_create_count = 0
+    # pylint: enable=invalid-name
     for png_file in sorted(os.listdir(directory_path)):
         if png_file.endswith(".png"):
             png_filename = os.path.splitext(png_file)[0]
