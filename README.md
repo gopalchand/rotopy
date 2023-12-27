@@ -1,3 +1,5 @@
+[![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
+
 ![Roto1](https://github.com/gopalchand/Rotofy/assets/45721890/2934fc37-4e18-48ef-8ca3-7c310de9a484)
 
 # Rotofy
@@ -118,7 +120,9 @@ The JSON files will be deleted unless the `--keepjson` flag option is used.
 
 ## Next Steps
 
-Conversion into a Python Package.
+1. Fix pylint errors.
+2. Code testing.
+3. Conversion into a Python Package.
 
 ## Contributing
 
