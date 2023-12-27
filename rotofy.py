@@ -17,11 +17,11 @@ import json
 import os
 import sys
 import argparse
-import cv2
 import traceback
 import glob
-import progressbar
 from datetime import datetime
+import progressbar
+import cv2
 
 EXIF_TOOL_CMD = "exiftool.exe"
 FFMPEG_CMD = "ffmpeg.exe"
@@ -43,6 +43,13 @@ MESSAGE_ERROR = 0
 MESSAGE_INFO = 1
 MESSAGE_WARN = 2
 MESSAGE_DEBUG = 3
+
+# Annotation defaults
+TOP_BAR = 30
+TEXT_OFFSET_X = 10
+TEXT_OFFSET_Y = 20
+TEXT_FONTSCALE = 0.4
+TEXT_FONTFACE = cv2.FONT_HERSHEY_SIMPLEX
 
 def log_message(level, message):
     """
@@ -146,7 +153,7 @@ try:
 
     # Validation
     if conversion_dir is not None:
-        if(os.path.exists(conversion_dir) is False):
+        if os.path.exists(conversion_dir) is False:
             log_message(MESSAGE_ERROR, f"conversion directory {conversion_dir} does not exist")
             sys.exit(ERR_MISSING_DIR)  # Use a non-zero exit code to indicate an error
 
@@ -202,16 +209,16 @@ try:
     if skipjson_mode is False:
 
         # Iterate through the PNG files in the directory
-        png_file_count = len(glob.glob1(directory_path,"*.png"))
-        if png_file_count == 0:
+        PNG_FILE_COUNT = len(glob.glob1(directory_path,"*.png"))
+        if PNG_FILE_COUNT == 0:
             log_message(MESSAGE_ERROR, "Error no PNG files found (conversion may be required) -exiting program")
             sys.exit(ERR_NO_PNG_FOR_JSON)  # Use a non-zero exit code to indicate an error
 
-        log_message(MESSAGE_INFO, f"Creating JSON files from {png_file_count} PNG files")
+        log_message(MESSAGE_INFO, f"Creating JSON files from {PNG_FILE_COUNT} PNG files")
         if rename_mode is True:
             log_message(MESSAGE_INFO, "Also renaming PNG files using modified date")
 
-        json_create_count = 0
+        JSON_CREATE_COUNT = 0
         # Iterate through all files in the directory
         for filename in os.listdir(directory_path):
             if filename.endswith(".png"):
@@ -221,20 +228,20 @@ try:
                 log_message(MESSAGE_DEBUG, f"EXIF tags read from file: {png_tags}")
                 source_file = png_tags.get('SourceFile')
                 modifydate_str = png_tags.get('Datemodify')  # if the file has been modified by another application
-                modifydate = None
+                MODIFYDATE = None
                 if modifydate_str is not None:
                     log_message(MESSAGE_DEBUG, "datemodify found - using modify date")
-                    modifydate = datetime.strptime(modifydate_str, "%Y-%m-%dT%H:%M:%S%z")
+                    MODIFYDATE = datetime.strptime(modifydate_str, "%Y-%m-%dT%H:%M:%S%z")
                 else:
                     log_message(MESSAGE_DEBUG, "datemodify is empty - falling back on File Modify Date")
                     modifydate_str = png_tags.get('FileModifyDate')
                     if modifydate_str is not None:
-                        modifydate = datetime.strptime(modifydate_str, "%Y:%m:%d %H:%M:%S%z")
+                        MODIFYDATE = datetime.strptime(modifydate_str, "%Y:%m:%d %H:%M:%S%z")
                 parameters = png_tags.get('Parameters')
 
                 log_message(MESSAGE_DEBUG, "EXIF extract")
                 log_message(MESSAGE_DEBUG, f"SourceFile = {source_file}")
-                log_message(MESSAGE_DEBUG, f"Modify Date = {modifydate}")
+                log_message(MESSAGE_DEBUG, f"Modify Date = {MODIFYDATE}")
                 log_message(MESSAGE_DEBUG, f"parameters = {parameters}")
 
                 if source_file is None:
@@ -251,11 +258,11 @@ try:
 
                 if rename_mode is True:
                     # Rename the file using the formatted timestamp if datemodify exists
-                    if modifydate is not None:
-                        new_filename = modifydate.strftime("%y%m%d%H%M%S") + file_extension
+                    if MODIFYDATE is not None:
+                        new_filename = MODIFYDATE.strftime("%y%m%d%H%M%S") + file_extension
 
                         if os.path.isfile(os.path.join(directory_path, new_filename)) is True:
-                            log_message(MESSAGE_ERROR, f"Two files have the same modify dates:{modifydate} - perhaps --rename has already been used resulting in new modify dates - exiting")
+                            log_message(MESSAGE_ERROR, f"Two files have the same modify dates:{MODIFYDATE} - perhaps --rename has already been used resulting in new modify dates - exiting")
                             sys.exit(ERR_RENAME_DUPLICATE)  # Use a non-zero exit code to indicate an error
                         else:
                             os.rename(os.path.join(directory_path, filename), os.path.join(directory_path, new_filename))
@@ -266,36 +273,36 @@ try:
 
                 # Extract the parameters from the text
                 if parameters is not None:
-                    extracted_parameters = sd_extract_parameters(parameters)
+                    EXTRACTED_PARAMETERS = sd_extract_parameters(parameters)
                     log_message(MESSAGE_DEBUG, "The extracted parameters are:")
-                    log_message(MESSAGE_DEBUG, f"{extracted_parameters}")
+                    log_message(MESSAGE_DEBUG, f"{EXTRACTED_PARAMETERS}")
                 else:
                     log_message(MESSAGE_DEBUG, f"file {filename} does not have a Parameters EXIF Tag - Using default values")
-                    extracted_parameters = 'None'
+                    EXTRACTED_PARAMETERS = 'None'
 
                 # Write Parameters to a text file with the same filename but with .txt extension
                 output_json_filename = os.path.splitext(new_filename)[0] + ".json"
                 with open(os.path.join(directory_path, output_json_filename), "w", -1, 'utf-8') as json_file:
-                    json.dump(extracted_parameters, json_file, indent=4)
+                    json.dump(EXTRACTED_PARAMETERS, json_file, indent=4)
                     if verbose_mode is True:
                         log_message(MESSAGE_DEBUG, f"The Parameters have been written to: {os.path.join(directory_path, output_json_filename)}")
                     else:
-                        json_create_count = json_create_count + 1
-                        pb_show(json_create_count,png_file_count, str(json_create_count))
+                        JSON_CREATE_COUNT = JSON_CREATE_COUNT + 1
+                        pb_show(JSON_CREATE_COUNT,PNG_FILE_COUNT, str(JSON_CREATE_COUNT))
             else:
                 log_message(MESSAGE_DEBUG, f"Skipping non-PNG file/directory {filename}")
 
     # Iterate through the PNG files in the directory
-    png_file_count = len(glob.glob1(directory_path,"*.png"))
-    if png_file_count == 0:
+    PNG_FILE_COUNT = len(glob.glob1(directory_path,"*.png"))
+    if PNG_FILE_COUNT == 0:
         log_message(MESSAGE_ERROR, "No PNG files found (conversion may be required) - exiting program")
         sys.exit(ERR_NO_PNG_TO_CONVERT)  # Use a non-zero exit code to indicate an error
 
-    log_message(MESSAGE_INFO, f"\nStarting PNG conversion to JPEG of {png_file_count} files")
+    log_message(MESSAGE_INFO, f"\nStarting PNG conversion to JPEG of {PNG_FILE_COUNT} files")
     if annotate_mode is True:
         log_message(MESSAGE_INFO, "Also annotating JPEG files with data from JSON files.")
 
-    jpeg_create_count = 0
+    JPEG_CREATE_COUNT = 0
     for png_file in sorted(os.listdir(directory_path)):
         if png_file.endswith(".png"):
             png_filename = os.path.splitext(png_file)[0]
@@ -306,24 +313,21 @@ try:
 
             if annotate_mode is True:
                 log_message(MESSAGE_DEBUG, f"preparing annotation")
-                top_bar = 30
-                text_offset_x = 10
-                text_offset_y = 20
 
                 json_file = os.path.join(directory_path, f"{png_filename}.json")
                 if os.path.exists(json_file):
                     with open(json_file, 'r', -1, 'utf-8') as f:
-                        text_to_draw =''
+                        TEXT_TO_DRAW =''
                         json_data = json.load(f)
                         if json_data != 'None':
-                            text_to_draw = f"{png_filename} | Steps {json_data['Steps']} | CFG {json_data['CFG scale']} | Seed {json_data['Seed']} | Denoise {json_data['Denoising strength']} |"
+                            TEXT_TO_DRAW = f"{png_filename} | Steps {json_data['Steps']} | CFG {json_data['CFG scale']} | Seed {json_data['Seed']} | Denoise {json_data['Denoising strength']} |"
                         else:
-                            text_to_draw = ""
+                            TEXT_TO_DRAW = ""
 
-                    log_message(MESSAGE_DEBUG, f"annotating file with {text_to_draw}")
+                    log_message(MESSAGE_DEBUG, f"annotating file with {TEXT_TO_DRAW}")
                     height, width, channels = image.shape
-                    image = cv2.rectangle(image, (0,0), (width, top_bar), (0,0,0), -1)
-                    image = cv2.putText(image, text_to_draw, (text_offset_x,text_offset_y), fontScale = 0.4, fontFace = cv2.FONT_HERSHEY_SIMPLEX, \
+                    image = cv2.rectangle(image, (0,0), (width, TOP_BAR), (0,0,0), -1)
+                    image = cv2.putText(image, TEXT_TO_DRAW, (TEXT_OFFSET_X,TEXT_OFFSET_Y), fontScale = TEXT_FONTSCALE, fontFace = TEXT_FONTFACE, \
                         color = (255,255,255), thickness = 1, bottomLeftOrigin=False)
                 else:
                     log_message(MESSAGE_ERROR, f"Error: JSON file {json_file} not found. Perhaps --skipjson has been used without JSON file creation - exiting program")
@@ -334,34 +338,34 @@ try:
             if verbose_mode is True:
                 log_message(MESSAGE_DEBUG, f"\nJPEG file {directory_path + jpeg_file} saved")
             else:
-                jpeg_create_count = jpeg_create_count + 1
-                pb_show(jpeg_create_count,png_file_count,str(jpeg_create_count))
+                JPEG_CREATE_COUNT = JPEG_CREATE_COUNT + 1
+                pb_show(JPEG_CREATE_COUNT,PNG_FILE_COUNT,str(JPEG_CREATE_COUNT))
 
     log_message(MESSAGE_INFO, "\nCreating Movie file")
     if framerate_val is True:
         log_message(MESSAGE_INFO, f"Also using frame rate of {framerate_val}")
 
     if movie_file is not None:
-        output_file = movie_file
-        log_message(MESSAGE_INFO, f"Also using movie_file {output_file}")
+        OUTPUT_FILE = movie_file
+        log_message(MESSAGE_INFO, f"Also using movie_file {OUTPUT_FILE}")
     else:
-        output_file = DEFAULT_MOVIE_FILENAME
+        OUTPUT_FILE = DEFAULT_MOVIE_FILENAME
 
     # Delete output file
-    if os.path.isfile(os.path.join(directory_path, output_file)):
+    if os.path.isfile(os.path.join(directory_path, OUTPUT_FILE)):
         if overwritemovie_mode is True:
-            log_message(MESSAGE_DEBUG, f"Deleting {os.path.join(directory_path, output_file)}")
-            os.remove(os.path.join(directory_path, output_file))
+            log_message(MESSAGE_DEBUG, f"Deleting {os.path.join(directory_path, OUTPUT_FILE)}")
+            os.remove(os.path.join(directory_path, OUTPUT_FILE))
         else:
             # Prompt the user and get input
-            response = input(f"\nMovie file {os.path.join(directory_path, output_file)} exists - use --overwritemovie to avoid in future. Delete [y/N]?")
+            response = input(f"\nMovie file {os.path.join(directory_path, OUTPUT_FILE)} exists - use --overwritemovie to avoid in future. Delete [y/N]?")
             disagree_list = {'no', 'n', ''}
             if response.lower() in disagree_list:
                 log_message(MESSAGE_ERROR, "Exiting program")
                 sys.exit(ERR_USER_EXIT)  # Use a non-zero exit code to indicate an error
             else:
-                log_message(MESSAGE_DEBUG, f"deleting {os.path.join(directory_path, output_file)}")
-                os.remove(os.path.join(directory_path, output_file))
+                log_message(MESSAGE_DEBUG, f"deleting {os.path.join(directory_path, OUTPUT_FILE)}")
+                os.remove(os.path.join(directory_path, OUTPUT_FILE))
 
     # Call ffmpeg to create the movie
     # Appropriate level of logging based upon verbose_mode
@@ -369,9 +373,9 @@ try:
     # frame rate is 1 Hz
 
     if verbose_mode is True:
-        loglevel = 'debug'
+        LOG_LEVEL = 'debug'
     else:
-        loglevel = 'panic'
+        LOG_LEVEL = 'panic'
 
     # This suffers from https://trac.ffmpeg.org/ticket/3164 - last frame is not vieweable
     # However the last frame is saved to the file as evidenced by, for example,
@@ -379,15 +383,15 @@ try:
 
     if framerate_val is not None:
         log_message(MESSAGE_WARN, "Last frame of movie file may not be vieweable for non-default frame rates")
-        ffmpeg_cmd_line = f'type {os.path.join(directory_path, "*.jpg")} | {FFMPEG_CMD} -loglevel {loglevel} -framerate {framerate_val}  -an -f image2pipe -i - {os.path.join(directory_path, output_file)}'
+        ffmpeg_cmd_line = f'type {os.path.join(directory_path, "*.jpg")} | {FFMPEG_CMD} -loglevel {LOG_LEVEL} -framerate {framerate_val}  -an -f image2pipe -i - {os.path.join(directory_path, OUTPUT_FILE)}'
     else:
-        ffmpeg_cmd_line = f'type {os.path.join(directory_path, "*.jpg")} | {FFMPEG_CMD} -loglevel {loglevel} -an -f image2pipe -i - {os.path.join(directory_path, output_file)}'
+        ffmpeg_cmd_line = f'type {os.path.join(directory_path, "*.jpg")} | {FFMPEG_CMD} -loglevel {LOG_LEVEL} -an -f image2pipe -i - {os.path.join(directory_path, OUTPUT_FILE)}'
 
     log_message(MESSAGE_INFO, f"About to run '{ffmpeg_cmd_line}'")
     try:
         # TODO - remove output from ffmpeg
         completed_process = subprocess.run(ffmpeg_cmd_line, shell=True, capture_output=False, check=True)
-        log_message(MESSAGE_INFO, f"Output file {output_file} successfully created")
+        log_message(MESSAGE_INFO, f"Output file {OUTPUT_FILE} successfully created")
     except subprocess.CalledProcessError as e:
         log_message(MESSAGE_WARN, f"ffmpeg returned a non-zero exit status: {e.returncode} - consider using --verbose")
 
