@@ -15,7 +15,7 @@ Combines all PNG or JPG  files in a particular directory into a video. The image
 
 ## Installation
 
-Install using git clone https://gihub.com/gopalchand/Rotofy
+Install using `git clone https://github.com/gopalchand/Rotofy`
 
 ## Usage
 
