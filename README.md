@@ -45,6 +45,8 @@ The `--rename` option will rename the files in input folder with the date they w
 The original files will be copied over to the bak subfolder.
 JPEG files derived from the PNG files will be concatenated in the output folder to produce the movie file, output/output.mkv. The files will be annotated with some Stable Diffusion parameters.
 
+For more detailed information including changing the frame rate, please see the usage below or the ![Wiki](https://github.com/gopalchand/Rotofy/wiki)
+
 ## Usage
 
 `usage: rotofy.py [-h] [--verbose] [--input_dir DIRECTORY] [--ouput_dir DIRECTORY] [--inputdir [--rename] [--skipjson] [--keepjson] [--annotate]
