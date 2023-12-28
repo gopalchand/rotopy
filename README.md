@@ -1,8 +1,8 @@
 [![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
 
-![Roto1](https://github.com/gopalchand/Rotofy/assets/45721890/2934fc37-4e18-48ef-8ca3-7c310de9a484)
+![Roto1](https://github.com/gopalchand/rotopy/assets/45721890/2934fc37-4e18-48ef-8ca3-7c310de9a484)
 
-# Rotofy
+# rotopy
 
 Combine all PNG or JPEG files in a particular directory into a video with frame rates from 1 to 30 Hz. The images must be of the same size.
 **Stable Diffusion** annotation (Steps, CFG scale, Seed, Denoising strength) can be overlayed if required for Stable Diffusion generated PNG files.
@@ -18,16 +18,16 @@ Combine all PNG or JPEG files in a particular directory into a video with frame 
 ## Installation
 
 ```
-git clone https://github.com/gopalchand/rotofy
+git clone https://github.com/gopalchand/rotopy
 pip install opencv-python
-cd rotofy
+cd rotopy
 ```
 
 ### Basic Test
 For testing, copy the contents of the source_images subfolder to the input folder
 
 ```
-python rotofy.py --input_dir input --output_dir output
+python rotopy.py --input_dir input --output_dir output
 ```
 
 The `--rename` option will rename the files in input folder with the date they were modified. It is only necessary if the filename order does not match the creation date order.
@@ -38,94 +38,94 @@ JPEG files derived from the PNG files will be concatenated in the output folder 
 Clear the contents of the output folder and copy over files created in Stable Dffusion image2image to the output folder. The files can be created over multiple days.
 
 ```
-python rotofy.py  --rename --annotate --input_dir input --output_dir output
+python rotopy.py  --rename --annotate --input_dir input --output_dir output
 ```
 
 The `--rename` option will rename the files in input folder with the date they were modified. It is only necessary if the filename order does not match the creation date order.
 The original files will be copied over to the bak subfolder.
 JPEG files derived from the PNG files will be concatenated in the output folder to produce the movie file, output/output.mkv. The files will be annotated with some Stable Diffusion parameters.
 
-For more detailed information including changing the frame rate, please see the usage below or the ![Wiki](https://github.com/gopalchand/Rotofy/wiki)
+For more detailed information including changing the frame rate, please see the usage below or the ![Wiki](https://github.com/gopalchand/rotopy/wiki)
 
 ## Usage
 
-`usage: rotofy.py [-h] [--verbose] [--input_dir DIRECTORY] [--ouput_dir DIRECTORY] [--inputdir [--rename] [--skipjson] [--keepjson] [--annotate]
+`usage: rotopy.py [-h] [--verbose] [--input_dir DIRECTORY] [--ouput_dir DIRECTORY] [--inputdir [--rename] [--skipjson] [--keepjson] [--annotate]
                  [--moviefile MOVIEFILE] [--framerate FRAMERATE] [--overwritemovie] [--skipmovie]`
 
-Convert a directory of PNG files into a video by converting them into JPEG (.JPG extensioN) with annotation if required. 
+Convert a directory of PNG files into a video by converting them into JPEG (.JPG extensioN) with annotation if required.
 For Stable Diffusion PNG files, annotation associated with image generation can be saved in the JPEG file if the `--annotate` option is used.
 A directory of non Stable Diffusion JPEG files can also be converted into a video if the `--skipjson` option is used.
 
 Create an output.mkv file containing all the PNG images concatenated in filename order.
 ```
-rotofy
+rotopy
 ```
 
 Create an output.mkv file containing all the PNG images concatenated in filename order in the subdirectory input.
 ```
-rotofy --input_directory input
+rotopy --input_directory input
 ```
 
 Create an output.mkv in the subdirectory output file containing all the PNG images in the current directory concatenated in filename order.
 ```
-rotofy --output_directory output
+rotopy --output_directory output
 ```
 
 
 Create an output.mkv in the subdirectory output containing all the PNG images in the  in the subdirectory input concatenated in filename order.
 ```
-rotofy --input_directory input --output_directory output
+rotopy --input_directory input --output_directory output
 ```
 
 Create a movie.avi file containing all the PNG images concatenated in filename order using a frame rate of 4 frames per second.
 ```
-rotofy --moviefile movie.avi --framerate 4
+rotopy --moviefile movie.avi --framerate 4
 ```
 
 Create an output.mkv file containing all the PNG images concatenated in filename order with debugging information displayed.
 ```
-rotofy --verbose
+rotopy --verbose
 ```
 
 Create an output.mkv file containing all the PNG images concatenated in filename order by **renaming the PNG files** using the modify date.
 Existing PNG files are backed-up in the subdirectory bak.
 This is sometimes necessary because each file has the format <counter>-<seed>.png where <counter> is a 5 digit number that resets every day.
 ```
-rotofy --rename
+rotopy --rename
 ```
 
 Create and output.mkv file containing all the PNG images concatenated in filename order with annotation.
 JSON files are created with data for the annotation and deleted unless `--keepjson` is used.
 ```
-rotofy --annotate
+rotopy --annotate
 ```
 
 will create an output.mkv file containing all the PNG images concatenated in filename order and keep the JSON files describing each image.
 This will allow the JSON generation part to be skipped to allow experimentation with frame rate settings etc. through a previous `--skipjson`
 ```
-rotofy --keepjson
+rotopy --keepjson
 ```
 
 Create an output.mkv file containing all the JPEG images concatenated in filename order.
 Used when the JSON files have already been created and saved through a previous `--keepjson`.
 If there are no JSON files present then `--annotate` should be avoided it needs JSON files.
 ```
-rotofy --skipjson
+rotopy --skipjson
 ```
 
 Skip the movie generation phase. JPEG files will be created from PNG files.
 ```
-rotofy --skipmovie
+rotopy --skipmovie
 ```
 
 Create an output.mkv file containing all the PNG images concatenated in filename order and overwrite an exisiting output.mkv file.
 ```
-rotofy --overwritemovie
+rotopy --overwritemovie
 ```
 
 Create an output.mkv file with 4 frames per second containing all the PNG images concatenated in filename order and overwrite an exisiting output.mkv file.
 ```
-rotofy --framerate 4
+rotopy --framerate 4
 ```
 
 ## Under the Hood
@@ -153,7 +153,7 @@ If the files need to be renamed because they have been generated over multiple d
 
 ### Movie file creation
 
-The JPEG files will then be concatenated in filename order using FFMPEG to create an movie file. 
+The JPEG files will then be concatenated in filename order using FFMPEG to create an movie file.
 
 The `--framerate` option can be used to change the framerate. There appears to be a bug in FFMPEG that skips the first and/or last frame of the video if the framerate is manually set.
 
