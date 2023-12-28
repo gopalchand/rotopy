@@ -22,7 +22,7 @@ git clone https://github.com/gopalchand/Rotofy
 
 ## Usage
 
-`usage: rotofy.py [-h] [--verbose] [--dir DIR] [--rename] [--skipjson] [--keepjson] [--annotate]
+`usage: rotofy.py [-h] [--verbose] [--input_dir DIRECTORY] [--ouput_dir DIRECTORY] [--inputdir [--rename] [--skipjson] [--keepjson] [--annotate]
                  [--moviefile MOVIEFILE] [--framerate FRAMERATE] [--overwritemovie] [--skipmovie]`
 
 Convert a directory of PNG files into a video by converting them into JPEG (.JPG extensioN) with annotation if required. 
@@ -34,9 +34,20 @@ Create an output.mkv file containing all the PNG images concatenated in filename
 rotofy
 ```
 
-Create an output.mkv file containing all the PNG images concatenated in filename order in the subdirectory input folder.
+Create an output.mkv file containing all the PNG images concatenated in filename order in the subdirectory input.
 ```
-rotofy --directory input_folder
+rotofy --input_directory input
+```
+
+Create an output.mkv in the subdirectory output file containing all the PNG images in the current directory concatenated in filename order.
+```
+rotofy --output_directory output
+```
+
+
+Create an output.mkv in the subdirectory output containing all the PNG images in the  in the subdirectory input concatenated in filename order.
+```
+rotofy --input_directory input --output_directory output
 ```
 
 Create a movie.avi file containing all the PNG images concatenated in filename order using a frame rate of 4 frames per second.
@@ -50,6 +61,7 @@ rotofy --verbose
 ```
 
 Create an output.mkv file containing all the PNG images concatenated in filename order by **renaming the PNG files** using the modify date.
+Existing PNG files are backed-up in the subdirectory bak.
 This is sometimes necessary because each file has the format <counter>-<seed>.png where <counter> is a 5 digit number that resets every day.
 ```
 rotofy --rename
