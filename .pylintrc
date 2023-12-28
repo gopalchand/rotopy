@@ -1,2 +1,4 @@
 [MAIN]
 max-line-length=132
+extension-pkg-whitelist=cv2
+include-naming-hint=True
