@@ -53,17 +53,17 @@ TEXT_OFFSET_Y = 20
 TEXT_FONTSCALE = 0.4
 TEXT_FONTFACE = cv2.FONT_HERSHEY_SIMPLEX
 
-verbose_mode = False
+VERBOSE_MODE = False
 input_dir = ""
-output_dir = ""
-rename_mode = False
-skipjson_mode = False
-keepjson_mode = False
-annotate_mode = False
-movie_file = ""
-framerate_val = 0
-overwritemovie_mode = False
-skipmovie_mode =False
+OUTPUT_DIR = ""
+RENAME_MODE = False
+SKIPJSON_MODE = False
+KEEPJSON_MODE = False
+ANNOTATE_MODE = False
+MOVIE_FILE = ""
+FRAMERATE_VAL = 0
+OVERWRITE_MOVIE_MODE = False
+SKIPMOVIE_MODE =False
 
 def log_message(level, message):
     """
@@ -77,7 +77,7 @@ def log_message(level, message):
 
     # TODO - use stdout and stderr for messages
     if level is MESSAGE_DEBUG:
-        if verbose_mode is True:
+        if VERBOSE_MODE is True:
             print("DEBUG: " + message)
     elif level is MESSAGE_WARN:
         print("Warning: " +  message)
@@ -154,9 +154,9 @@ def main():
         # Not recommended - avi => MPEG-4 Video (FMP4) (non-H.264)
         # Not supported - mpg => ERROR: MPEG-1/2 does not support 5/1 fps
 
-        if movie_file is not None:
+        if MOVIE_FILE is not None:
             supported_movie_extensions = {'.mkv', '.mp4', '.flv', '.avi'}
-            movie_file_name, movie_file_extension = os.path.splitext(movie_file)
+            movie_file_name, movie_file_extension = os.path.splitext(MOVIE_FILE)
             log_message(MESSAGE_DEBUG, f"Movie file extension = {movie_file_extension}")
             if movie_file_extension == "":
                 log_message(MESSAGE_ERROR, f"invalid file extension for movie file:'{movie_file_extension}' \
@@ -169,21 +169,21 @@ def main():
                     log_message(MESSAGE_ERROR, f"unsupported extension for movie file:'{movie_file_extension}'")
                     sys.exit(ERR_USUPPORTED_MOVIE_EXT)  # Use a non-zero exit code to indicate an error
 
-        if framerate_val is not None:
-            if framerate_val < 1 or framerate_val > 30:
-                log_message(MESSAGE_ERROR, f"frame rate value {framerate_val} is out of range 1..30")
+        if FRAMERATE_VAL is not None:
+            if FRAMERATE_VAL < 1 or FRAMERATE_VAL > 30:
+                log_message(MESSAGE_ERROR, f"frame rate value {FRAMERATE_VAL} is out of range 1..30")
                 sys.exit(ERR_FRAMERATE_OUT_OF_RANGE)  # Use a non-zero exit code to indicate an error
 
-        log_message(MESSAGE_DEBUG, f"verbose = {verbose_mode}")
+        log_message(MESSAGE_DEBUG, f"verbose = {VERBOSE_MODE}")
         log_message(MESSAGE_DEBUG, f"conversion_directory = {input_dir}")
-        log_message(MESSAGE_DEBUG, f"rename = {rename_mode}")
-        log_message(MESSAGE_DEBUG, f"skip JSON = {skipjson_mode}")
-        log_message(MESSAGE_DEBUG, f"keep JSON = {keepjson_mode}")
-        log_message(MESSAGE_DEBUG, f"annotate = {annotate_mode}")
-        log_message(MESSAGE_DEBUG, f"movie_file = {movie_file}")
-        log_message(MESSAGE_DEBUG, f"frame rate = {framerate_val}")
-        log_message(MESSAGE_DEBUG, f"overwritemovie_mode = {overwritemovie_mode}")
-        log_message(MESSAGE_DEBUG, f"skip Movie = {skipmovie_mode}")
+        log_message(MESSAGE_DEBUG, f"rename = {RENAME_MODE}")
+        log_message(MESSAGE_DEBUG, f"skip JSON = {SKIPJSON_MODE}")
+        log_message(MESSAGE_DEBUG, f"keep JSON = {KEEPJSON_MODE}")
+        log_message(MESSAGE_DEBUG, f"annotate = {ANNOTATE_MODE}")
+        log_message(MESSAGE_DEBUG, f"movie_file = {MOVIE_FILE}")
+        log_message(MESSAGE_DEBUG, f"frame rate = {FRAMERATE_VAL}")
+        log_message(MESSAGE_DEBUG, f"overwritemovie_mode = {OVERWRITE_MOVIE_MODE}")
+        log_message(MESSAGE_DEBUG, f"skip Movie = {SKIPMOVIE_MODE}")
 
         # Path to the Input Pictures directory
         if input_dir is None:
@@ -201,12 +201,12 @@ Are you sure you want to continue with current directory [Y/n]?")
 
         # Path to the Output Pictures directory
         # Use the input directory unless output_dir is used
-        if output_dir is None:
+        if OUTPUT_DIR is None:
             output_directory_path = input_directory_path
         else:
-            output_directory_path = output_dir
+            output_directory_path = OUTPUT_DIR
 
-        if skipjson_mode is False:
+        if SKIPJSON_MODE is False:
             # Iterate through the PNG files in the directory
             PNG_FILE_COUNT = len(glob.glob1(input_directory_path,"*.png"))
             if PNG_FILE_COUNT == 0:
@@ -215,7 +215,7 @@ Are you sure you want to continue with current directory [Y/n]?")
                 sys.exit(ERR_NO_PNG_FOR_JSON)  # Use a non-zero exit code to indicate an error
 
             log_message(MESSAGE_INFO, f"Creating JSON files from {PNG_FILE_COUNT} PNG files")
-            if rename_mode is True:
+            if RENAME_MODE is True:
                 log_message(MESSAGE_INFO, "Also renaming PNG files using modified date")
 
             # pylint: disable=invalid-name
@@ -234,20 +234,20 @@ Are you sure you want to continue with current directory [Y/n]?")
 
                     # if the file has been modified by another application
                     modifydate_str = png_tags.get('Datemodify')
-                    MODIFYDATE = None
+                    MODIFY_DATE = None
                     if modifydate_str is not None:
                         log_message(MESSAGE_DEBUG, "datemodify found - using modify date")
-                        MODIFYDATE = datetime.strptime(modifydate_str, "%Y-%m-%dT%H:%M:%S%z")
+                        MODIFY_DATE = datetime.strptime(modifydate_str, "%Y-%m-%dT%H:%M:%S%z")
                     else:
                         log_message(MESSAGE_DEBUG, "datemodify is empty - falling back on File Modify Date")
                         modifydate_str = png_tags.get('FileModifyDate')
                         if modifydate_str is not None:
-                            MODIFYDATE = datetime.strptime(modifydate_str, "%Y:%m:%d %H:%M:%S%z")
+                            MODIFY_DATE = datetime.strptime(modifydate_str, "%Y:%m:%d %H:%M:%S%z")
                     parameters = png_tags.get('Parameters')
 
                     log_message(MESSAGE_DEBUG, "EXIF extract")
                     log_message(MESSAGE_DEBUG, f"SourceFile = {source_file}")
-                    log_message(MESSAGE_DEBUG, f"Modify Date = {MODIFYDATE}")
+                    log_message(MESSAGE_DEBUG, f"Modify Date = {MODIFY_DATE}")
                     log_message(MESSAGE_DEBUG, f"parameters = {parameters}")
 
                     if source_file is None:
@@ -264,13 +264,13 @@ Are you sure you want to continue with current directory [Y/n]?")
                     # default if rename is unsuccesful
                     new_filename = filename
 
-                    if rename_mode is True:
+                    if RENAME_MODE is True:
                         # Rename the file using the formatted timestamp if datemodify exists
-                        if MODIFYDATE is not None:
-                            new_filename = MODIFYDATE.strftime("%y%m%d%H%M%S") + file_extension
+                        if MODIFY_DATE is not None:
+                            new_filename = MODIFY_DATE.strftime("%y%m%d%H%M%S") + file_extension
 
                             if os.path.isfile(os.path.join(input_directory_path, new_filename)) is True:
-                                log_message(MESSAGE_ERROR, f"Two files have the same modify dates:{MODIFYDATE} \
+                                log_message(MESSAGE_ERROR, f"Two files have the same modify dates:{MODIFY_DATE} \
 - perhaps --rename has already been used resulting in new modify dates - exiting")
                                 sys.exit(ERR_RENAME_DUPLICATE)  # Use a non-zero exit code to indicate an error
                             else:
@@ -334,7 +334,7 @@ f"file {filename} does not have a Parameters EXIF Tag \
                     with open(os.path.join(output_directory_path, output_json_filename), \
 "w", -1, 'utf-8') as json_file:
                         json.dump(EXTRACTED_PARAMETERS, json_file, indent=4)
-                        if verbose_mode is True:
+                        if VERBOSE_MODE is True:
                             log_message(MESSAGE_DEBUG, f"The Parameters have been written to: \
 {os.path.join(output_directory_path, output_json_filename)}")
                         else:
@@ -351,7 +351,7 @@ f"file {filename} does not have a Parameters EXIF Tag \
             sys.exit(ERR_NO_PNG_TO_CONVERT)  # Use a non-zero exit code to indicate an error
 
         log_message(MESSAGE_INFO, f"\nStarting PNG conversion to JPEG of {PNG_FILE_COUNT} files")
-        if annotate_mode is True:
+        if ANNOTATE_MODE is True:
             log_message(MESSAGE_INFO, "Also annotating JPEG files with data from JSON files.")
 
         # pylint: disable=invalid-name
@@ -366,7 +366,7 @@ f"file {filename} does not have a Parameters EXIF Tag \
 for conversion")
                 image = cv2.imread(os.path.join(input_directory_path, f"{png_file}"))
 
-                if annotate_mode is True:
+                if ANNOTATE_MODE is True:
                     log_message(MESSAGE_DEBUG, "preparing annotation")
 
                     json_file = os.path.join(input_directory_path, f"{png_filename}.json")
@@ -395,7 +395,7 @@ Perhaps --skipjson has been used without JSON file creation - exiting program")
 
                 jpeg_file =os.path.splitext(png_file)[0] + ".jpg"
                 cv2.imwrite(os.path.join(output_directory_path, f"{jpeg_file}"), image)
-                if verbose_mode is True:
+                if VERBOSE_MODE is True:
                     log_message(MESSAGE_DEBUG, f"\nJPEG file {output_directory_path + jpeg_file} \
 saved")
                 else:
@@ -403,18 +403,18 @@ saved")
                     pb_show(jpeg_create_count,PNG_FILE_COUNT,str(jpeg_create_count))
 
         log_message(MESSAGE_INFO, "\nCreating Movie file")
-        if framerate_val is True:
-            log_message(MESSAGE_INFO, f"Also using frame rate of {framerate_val}")
+        if FRAMERATE_VAL is True:
+            log_message(MESSAGE_INFO, f"Also using frame rate of {FRAMERATE_VAL}")
 
-        if movie_file is not None:
-            OUTPUT_MOVIE_FILE = movie_file
+        if MOVIE_FILE is not None:
+            OUTPUT_MOVIE_FILE = MOVIE_FILE
             log_message(MESSAGE_INFO, f"Also using movie_file {OUTPUT_MOVIE_FILE}")
         else:
             OUTPUT_MOVIE_FILE = DEFAULT_MOVIE_FILENAME
 
         # Delete output file
         if os.path.isfile(os.path.join(output_directory_path, OUTPUT_MOVIE_FILE)):
-            if overwritemovie_mode is True:
+            if OVERWRITE_MOVIE_MODE is True:
                 log_message(MESSAGE_DEBUG, \
 f"Deleting {os.path.join(output_directory_path, OUTPUT_MOVIE_FILE)}")
                 os.remove(os.path.join(output_directory_path, OUTPUT_MOVIE_FILE))
@@ -437,7 +437,7 @@ f"deleting {os.path.join(output_directory_path, OUTPUT_MOVIE_FILE)}")
         # no audio stream
         # frame rate is 1 Hz
 
-        if verbose_mode is True:
+        if VERBOSE_MODE is True:
             LOG_LEVEL = 'debug'
         else:
             LOG_LEVEL = 'panic'
@@ -446,11 +446,11 @@ f"deleting {os.path.join(output_directory_path, OUTPUT_MOVIE_FILE)}")
         # However the last frame is saved to the file as evidenced by, for example,
         # ffmpeg -r <framerate> -i file.mkv -r 1 mkv%03d.png
 
-        if framerate_val is not None:
+        if FRAMERATE_VAL is not None:
             log_message(MESSAGE_WARN, "Last frame of movie file may not be vieweable \
 for non-default frame rates")
             ffmpeg_cmd_line = f'type {os.path.join(output_directory_path, "*.jpg")} | \
-{FFMPEG_CMD} -loglevel {LOG_LEVEL} -framerate {framerate_val}  \
+{FFMPEG_CMD} -loglevel {LOG_LEVEL} -framerate {FRAMERATE_VAL}  \
 -an -f image2pipe -i - {os.path.join(output_directory_path, OUTPUT_MOVIE_FILE)}'
         else:
             ffmpeg_cmd_line = f'type {os.path.join(output_directory_path, "*.jpg")} | \
@@ -468,14 +468,14 @@ for non-default frame rates")
     - consider using --verbose")
 
         #tidy up
-        if keepjson_mode is False:
+        if KEEPJSON_MODE is False:
             for json_file in sorted(os.listdir(output_directory_path)):
                 if json_file.endswith(".json"):
                     json_filename = os.path.splitext(json_file)[0]
                     log_message(MESSAGE_DEBUG, f"Deleting file {output_directory_path + json_file}")
                     os.remove(os.path.join(output_directory_path, json_file))
 
-    except Exception as e:
+    except Exception:
         log_message(MESSAGE_ERROR, \
 f"Unhandled exception: {traceback.format_exception(*sys.exc_info())}")
         raise
@@ -501,16 +501,16 @@ if __name__ == '__main__':
     # Parse the arguments
     args = parser.parse_args()
 
-    verbose_mode = args.verbose
-    input_dir = args.input_dir
-    output_dir = args.output_dir
-    rename_mode = args.rename
-    skipjson_mode = args.skipjson
-    keepjson_mode = args.keepjson
-    annotate_mode = args.annotate
-    movie_file = args.moviefile
-    framerate_val = args.framerate
-    overwritemovie_mode = args.overwritemovie
-    skipmovie_mode = args.skipmovie
+    VERBOSE_MODE = args.verbose
+    INPUT_DIR = args.input_dir
+    OUTPUT_DIR = args.output_dir
+    RENAME_MODE = args.rename
+    SKIPJSON_MODE = args.skipjson
+    KEEPJSON_MODE = args.keepjson
+    ANNOTATE_MODE = args.annotate
+    MOVIE_FILE = args.moviefile
+    FRAMERATE_VAL = args.framerate
+    OVERWRITE_MOVIE_MODE = args.overwritemovie
+    SKIPMOVIE_MODE = args.skipmovie
 
     main()
