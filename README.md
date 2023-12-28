@@ -2,7 +2,7 @@
 
 ![Roto1](https://github.com/gopalchand/rotopy/assets/45721890/2934fc37-4e18-48ef-8ca3-7c310de9a484)
 
-# rotopy
+# RotoPy
 
 Combine all PNG or JPEG files in a particular directory into a video with frame rates from 1 to 30 Hz. The images must be of the same size.
 **Stable Diffusion** annotation (Steps, CFG scale, Seed, Denoising strength) can be overlayed if required for Stable Diffusion generated PNG files.

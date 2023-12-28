@@ -1,5 +1,5 @@
 """
-rotopy: Combine PNG or JPEG files in a folder into a movie file.
+RotoPy: Combine PNG or JPEG files in a folder into a movie file.
 """
 
 # # Python pre-requisites
