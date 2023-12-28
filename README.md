@@ -4,14 +4,21 @@
 
 # Rotofy
 
-Combines all PNG or JPG  files in a particular directory into a video. The images must be of the same size.
+Combines all PNG or JPG  files in a particular directory into a video with frame rates from 1 to 30 Hz. The images must be of the same size.
 **Stable Diffusion** annotation (Steps, CFG scale, Seed, Denoising strength) can be overlayed if required for Stable Diffusion generated PNG files.
+
+## Prerequisites
+
+* Tested in Microsoft Widows 10
+* exiftool (https://exiftool.org/) and ffmpeg (https://ffmpeg.org/) are required and must be in the PATH environment variable
+* Python 3.10.6 or higher required.
 
 ## Installation
 
-Tested in Microsoft Widows 10
-exiftool (https://exiftool.org/) and ffmpeg (https://ffmpeg.org/) are required must be in the PATH environment variable
-Python 3.10.6 or higher required.
+Install using 
+```
+git clone https://github.com/gopalchand/Rotofy
+```
 
 ## Usage
 
@@ -22,63 +29,65 @@ Convert a directory of PNG files into a video by converting them into JPEG (.JPG
 For Stable Diffusion PNG files, annotation associated with image generation can be saved in the JPEG file if the `--annotate` option is used.
 A directory of non Stable Diffusion JPEG files can also be converted into a video if the `--skipjson` option is used.
 
+Create an output.mkv file containing all the PNG images concatenated in filename order.
 ```
 rotofy
 ```
-will create an output.avi file containing all the PNG images concatenated in filename order.
 
+Create an output.mkv file containing all the PNG images concatenated in filename order in the subdirectory input folder.
 ```
-rotofy --directory .
+rotofy --directory input_folder
 ```
-will create an output.avi file containing all the PNG images concatenated in filename order in the directory specified.
 
-
+Create a movie.avi file containing all the PNG images concatenated in filename order using a frame rate of 4 frames per second.
 ```
 rotofy --moviefile movie.avi --framerate 4
 ```
-will create a movie.avi file containing all the PNG images concatenated in filename order using a frame rate of 4 frames per second.
 
+Create an output.mkv file containing all the PNG images concatenated in filename order with debugging information displayed.
 ```
 rotofy --verbose
 ```
-will create an output.avi file containing all the PNG images in the current directory concatenated in filename order and provide debugging information.
 
+Create an output.mkv file containing all the PNG images concatenated in filename order by **renaming the PNG files** using the modify date.
+This is sometimes necessary because each file has the format <counter>-<seed>.png where <counter> is a 5 digit number that resets every day.
 ```
 rotofy --rename
 ```
-will create an output.avi file containing all the PNG images concatenated in modify date order by **renaming the PNG files** using the modify date.
-This is sometimes necessary because each file has the format <counter>-<seed>.png where <counter> is a 5 digit number that resets every day.
 
+Create and output.mkv file containing all the PNG images concatenated in filename order with annotation.
+JSON files are created with data for the annotation and deleted unless `--keepjson` is used.
 ```
 rotofy --annotate
 ```
-will create an output.avi file containing all the PNG images concatenated in filename order with annotation.
 
+will create an output.mkv file containing all the PNG images concatenated in filename order and keep the JSON files describing each image.
+This will allow the JSON generation part to be skipped to allow experimentation with frame rate settings etc. through a previous `--skipjson`
 ```
 rotofy --keepjson
 ```
-will create an output.avi file containing all the PNG images concatenated in filename order and keep the JSON files describing each image.
-This will allow the JSON generation part to be skipped.
 
+Create an output.mkv file containing all the JPEG images concatenated in filename order.
+Used when the JSON files have already been created and saved through a previous `--keepjson`.
+If there are no JSON files present then `--annotate` should be avoided it needs JSON files.
 ```
 rotofy --skipjson
 ```
-Skip the JSON file generation phase and create the movie.
 
+Skip the movie generation phase. JPEG files will be created from PNG files.
 ```
 rotofy --skipmovie
 ```
-Skip the movie generation phase.
 
+Create an output.mkv file containing all the PNG images concatenated in filename order and overwrite an exisiting output.mkv file.
 ```
 rotofy --overwritemovie
 ```
-will create an output.avi file containing all the PNG images concatenated in filename order and not prompt before overwriting an existing output.avi file
 
+Create an output.mkv file with 4 frames per second containing all the PNG images concatenated in filename order and overwrite an exisiting output.mkv file.
 ```
 rotofy --framerate 4
 ```
-will create an output.avi file containing all the PNG images concatenated in filename order using a framerate of 4 per second.
 
 ## Under the Hood
 
