@@ -7,11 +7,15 @@
 Combines all PNG or JPG  files in a particular directory into a video. The images must be of the same size.
 **Stable Diffusion** annotation (Steps, CFG scale, Seed, Denoising strength) can be overlayed if required for Stable Diffusion generated PNG files.
 
+## Prerequisites
+
+* Tested in Microsoft Widows 10
+* exiftool (https://exiftool.org/) and ffmpeg (https://ffmpeg.org/) are required must be in the PATH environment variable
+* Python 3.10.6 or higher required.
+
 ## Installation
 
-Tested in Microsoft Widows 10
-exiftool (https://exiftool.org/) and ffmpeg (https://ffmpeg.org/) are required must be in the PATH environment variable
-Python 3.10.6 or higher required.
+Install using git clone https://gihub.com/gopalchand/Rotofy
 
 ## Usage
 
