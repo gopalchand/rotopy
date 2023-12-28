@@ -1,6 +1,6 @@
 [![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
 
-![Roto1](https://github.com/gopalchand/rotopy/assets/45721890/2934fc37-4e18-48ef-8ca3-7c310de9a484)
+![Rotopy3](https://github.com/gopalchand/rotopy/assets/45721890/2818fb09-1afa-402f-9bbd-1777f38dfdf4)
 
 # RotoPy
 
