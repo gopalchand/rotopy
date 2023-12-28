@@ -4,21 +4,46 @@
 
 # Rotofy
 
-Combines all PNG or JPG  files in a particular directory into a video with frame rates from 1 to 30 Hz. The images must be of the same size.
+Combine all PNG or JPEG files in a particular directory into a video with frame rates from 1 to 30 Hz. The images must be of the same size.
 **Stable Diffusion** annotation (Steps, CFG scale, Seed, Denoising strength) can be overlayed if required for Stable Diffusion generated PNG files.
 
 ## Prerequisites
 
-* Tested in Microsoft Widows 10
+* Windows 10 or higher (not yet tested under Ubuntu)
 * exiftool (https://exiftool.org/) and ffmpeg (https://ffmpeg.org/) are required and must be in the PATH environment variable
-* Python 3.10.6 or higher required.
+* Python >= 3.10.6
+* OpenCV >= 4.8.0
+* numpy >= 1.26.0
 
 ## Installation
 
-Install using 
 ```
-git clone https://github.com/gopalchand/Rotofy
+git clone https://github.com/gopalchand/rotofy
+pip install opencv-python
+cd rotofy
 ```
+
+### Basic Test
+For testing, copy the contents of the source_images subfolder to the input folder
+
+```
+python rotofy.py --input_dir input --output_dir output
+```
+
+The `--rename` option will rename the files in input folder with the date they were modified. It is only necessary if the filename order does not match the creation date order.
+The original files will be copied over to the bak subfolder.
+JPEG files derived from the PNG files will be concatenated in the output folder to produce the movie file, output/output.mkv.
+
+### Stable Diffusion Annotation Test
+Clear the contents of the output folder and copy over files created in Stable Dffusion image2image to the output folder. The files can be created over multiple days.
+
+```
+python rotofy.py  --rename --annotate --input_dir input --output_dir output
+```
+
+The `--rename` option will rename the files in input folder with the date they were modified. It is only necessary if the filename order does not match the creation date order.
+The original files will be copied over to the bak subfolder.
+JPEG files derived from the PNG files will be concatenated in the output folder to produce the movie file, output/output.mkv. The files will be annotated with some Stable Diffusion parameters.
 
 ## Usage
 
