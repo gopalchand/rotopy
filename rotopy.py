@@ -28,7 +28,7 @@ FFMPEG_CMD = "ffmpeg.exe"
 DEFAULT_MOVIE_FILENAME = "output.mkv"
 DEFAULT_BACKUP_DIR = "bak"
 DEFAULT_PNG_EXTENSION = "png"
-DEFAULT_JPEG_EXTENSION = "png"
+DEFAULT_JPEG_EXTENSION = "jpg"
 
 # Exit Errors
 ERR_MISSING_DIR = 1001
@@ -51,7 +51,7 @@ MESSAGE_DEBUG = 3
 TOP_BAR = 30
 TEXT_OFFSET_X = 10
 TEXT_OFFSET_Y = 20
-TEXT_FONTSCALE = 0.4
+TEXT_FONTSCALE = 0.2
 TEXT_FONTFACE = cv2.FONT_HERSHEY_SIMPLEX
 
 # Input arguments
@@ -109,6 +109,8 @@ def sd_extract_parameters(sd_parameters_text):
     """
     sd_extracted_parameters = {}
     sd_key_mapping = {
+        "Sampler" : "Sampler",
+        "Model" : "Model",
         "Steps": "Steps",
         "Seed": "Seed",
         "CFG scale": "CFG scale",
@@ -209,7 +211,7 @@ Are you sure you want to continue with current directory [Y/n]?")
 
         if SKIPJSON_MODE is False:
             # Iterate through the PNG files in the directory
-            png_file_count = len(glob.glob1(input_directory_path,"*"+DEFAULT_PNG_EXTENSION))
+            png_file_count = len(glob.glob1(input_directory_path,"*." + DEFAULT_PNG_EXTENSION))
             if png_file_count == 0:
                 log_message(MESSAGE_ERROR, "Error no PNG files found (conversion may be required) \
     - exiting program")
@@ -261,7 +263,7 @@ Are you sure you want to continue with current directory [Y/n]?")
                     if RENAME_MODE is True:
                         # Rename the file using the formatted timestamp if datemodify exists
                         if modify_date is not None:
-                            new_filename = modify_date.strftime("%y%m%d%H%M%S") + DEFAULT_PNG_EXTENSION
+                            new_filename = modify_date.strftime("%y%m%d%H%M%S") + "." + DEFAULT_PNG_EXTENSION
 
                             if os.path.isfile(os.path.join(input_directory_path, new_filename)) is True:
                                 log_message(MESSAGE_ERROR, f"Two files have the same modify dates:{modify_date} \
@@ -317,6 +319,8 @@ f"file {filename} does not have a Parameters EXIF Tag \
 - Using default values")
                         extracted_parameters = 'None'
 
+                    # TODO - check if output_directory_path exists
+
                     # Write Parameters to a text file with the same filename but with .txt extension
                     output_json_filename = os.path.splitext(new_filename)[0] + ".json"
                     with open(os.path.join(output_directory_path, output_json_filename), \
@@ -355,15 +359,19 @@ for conversion")
                 if ANNOTATE_MODE is True:
                     log_message(MESSAGE_DEBUG, "preparing annotation")
 
-                    json_file = os.path.join(input_directory_path, f"{png_filename}.json")
+                    json_file = os.path.join(output_directory_path, f"{png_filename}.json")
                     if os.path.exists(json_file):
                         with open(json_file, 'r', -1, 'utf-8') as f:
                             text_to_draw =''
                             json_data = json.load(f)
                             if json_data != 'None':
                                 text_to_draw = f"{png_filename} | Steps {json_data['Steps']} | \
-CFG {json_data['CFG scale']} | Seed {json_data['Seed']} | \
-Denoise {json_data['Denoising strength']} |"
+CFG {json_data['CFG scale']} | Seed {json_data['Model']} | \
+Sampler {json_data['Sampler']} | Seed {json_data['Seed']}"
+
+# TODO - cope with missing JSON data
+# Denoise {json_data['Denoising strength']} |"
+
                             else:
                                 text_to_draw = ""
 
@@ -379,7 +387,7 @@ Perhaps --skipjson has been used without JSON file creation - exiting program")
                         sys.exit(ERR_NO_JSON_FOR_ANNOTATE)  \
                             # Use a non-zero exit code to indicate an error
 
-                jpeg_file =os.path.splitext(png_file)[0] + DEFAULT_JPEG_EXTENSION
+                jpeg_file =os.path.splitext(png_file)[0] + "." + DEFAULT_JPEG_EXTENSION
                 cv2.imwrite(os.path.join(output_directory_path, f"{jpeg_file}"), image)
                 if VERBOSE_MODE is True:
                     log_message(MESSAGE_DEBUG, f"\nJPEG file {output_directory_path + jpeg_file} \
@@ -435,14 +443,13 @@ f"deleting {os.path.join(output_directory_path, output_movie_file)}")
         if FRAMERATE_VAL is not None:
             log_message(MESSAGE_WARN, "Last frame of movie file may not be vieweable \
 for non-default frame rates")
-            ffmpeg_cmd_line = f'type {os.path.join(output_directory_path, DEFAULT_JPEG_EXTENSION)} | \
+            ffmpeg_cmd_line = f'type {os.path.join(output_directory_path, "*." + DEFAULT_JPEG_EXTENSION)} | \
 {FFMPEG_CMD} -loglevel {log_level} -framerate {FRAMERATE_VAL}  \
 -an -f image2pipe -i - {os.path.join(output_directory_path, output_movie_file)}'
         else:
-            ffmpeg_cmd_line = f'type {os.path.join(output_directory_path, DEFAULT_JPEG_EXTENSION)} | \
-    {FFMPEG_CMD} -loglevel {log_level} -an -f image2pipe -i - \
-    {os.path.join(output_directory_path, output_movie_file)}'
-
+            ffmpeg_cmd_line = f'type {os.path.join(output_directory_path, "*." + DEFAULT_JPEG_EXTENSION)} | \
+{FFMPEG_CMD} -loglevel {log_level} -an -f image2pipe -i - \
+{os.path.join(output_directory_path, output_movie_file)}'
         log_message(MESSAGE_INFO, f"About to run '{ffmpeg_cmd_line}'")
         try:
             _completed_process = subprocess.run \
